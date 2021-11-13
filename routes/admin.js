@@ -7,7 +7,7 @@ const products = [];
 
 // /admin/add-product => GET
 router.get('/add-product', (req, res, next) => {
-    res.render('add-product', { docTitle: "Add Product", path: "/add-product" });
+    res.render('add-product', { pageTitle: 'Add Product', path: '/admin/add-product', formsCSS: true, productCSS: true, activeAddProduct: true });
 });
 
 // /admin/add-product => POST
@@ -16,5 +16,5 @@ router.post('/add-product', (req, res, next) => {
     res.redirect('/');
 });
 
-exports.router = router;
+exports.routes = router;
 exports.products = products;
