@@ -1,12 +1,11 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const sequelize = require('./util/database');
 const errorController = require('./controllers/error');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const res = require('express/lib/response');
-//TO DO: 1. install mysql2 package
+
 const app = express();
 app.set('view engine', 'ejs');       //to define our templating engine to server
 app.set('views', 'views');           //to show the location of template files
@@ -19,5 +18,10 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-app.listen(3000);
-
+sequelize.sync()
+    .then(result => {
+        app.listen(3000);
+    })
+    .catch(err => {
+        console.log(err)
+    });
