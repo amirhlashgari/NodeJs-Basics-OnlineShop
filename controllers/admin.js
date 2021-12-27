@@ -65,6 +65,9 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    // *** VERY IMPORTANT ***//
+    // .select('title price -_id') // when retrieving data it only gives title&price of products. and because _id is specific we should omit this also by "-".
+    // .populate('userId', 'name') // when we need extra information about user instead of looping through users and select the use by this userId we could use mongoose populate method due to collection relations and also select just name and also _id(because we dont omit that).
     .then(products => {
       res.render('admin/products', {
         prods: products,
