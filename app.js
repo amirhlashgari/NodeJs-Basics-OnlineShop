@@ -15,9 +15,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById('61c91956ec7a272dfe8562f3')
+    User.findById('61c971150878c9864103ab12')
         .then(user => {
-            req.user = new User(user.name, user.email, user.cart, user._id);
+            req.user = user;
             next();
         })
         .catch(err => console.log(err));
@@ -30,6 +30,13 @@ app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://amirhosein:amirhosein@cluster0.ykhje.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
     .then(result => {
+        User.findOne()
+            .then(user => {
+                if (!user) {
+                    const user = new User({ name: 'amirhosein', email: 'test@test.com', cart: { items: [] } });
+                    user.save();
+                }
+            })
         app.listen(3000);
     })
     .catch(err => console.log(err));
