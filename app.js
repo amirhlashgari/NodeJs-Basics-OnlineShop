@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoConnect = require('./util/database').mongoConnect;
+const mongoose = require('mongoose');
 const errorController = require('./controllers/error');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -28,6 +28,8 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(() => {
-    app.listen(3000);
-});
+mongoose.connect('mongodb+srv://amirhosein:amirhosein@cluster0.ykhje.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+    .then(result => {
+        app.listen(3000);
+    })
+    .catch(err => console.log(err));
