@@ -3,22 +3,29 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const errorController = require('./controllers/error');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const User = require('./models/user');
 
+const MONGODB_URI = 'mongodb+srv://amirhosein:amirhosein@cluster0.ykhje.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+
 const app = express();
+const store = new MongoDBStore({ uri: MONGODB_URI, collection: 'sessions' });
 app.set('view engine', 'ejs');       //to define our templating engine to server
 app.set('views', 'views');           //to show the location of template files
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'backendStoredSession', resave: false, saveUninitialized: false }));
+app.use(session({ secret: 'backendStoredSession', resave: false, saveUninitialized: false, store: store }));
 
 app.use((req, res, next) => {
-    User.findById('61c971150878c9864103ab12')
+    if (!req.session.user) {
+        return next();
+    }
+    User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
             next();
@@ -32,7 +39,7 @@ app.use(authRoutes);
 
 app.use(errorController.get404);
 
-mongoose.connect('mongodb+srv://amirhosein:amirhosein@cluster0.ykhje.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+mongoose.connect(MONGODB_URI)
     .then(result => {
         User.findOne()
             .then(user => {
