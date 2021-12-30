@@ -50,20 +50,23 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImageUrl = req.body.imageUrl;
   Product.findById(prodId)
     .then(product => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/');
+      }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
-      return product.save();
-    })
-    .then(result => {
-      res.redirect('/admin/products');
+      return product.save()
+        .then(result => {
+          res.redirect('/admin/products');
+        })
     })
     .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.user._id })
     // *** VERY IMPORTANT ***//
     // .select('title price -_id') // when retrieving data it only gives title&price of products. and because _id is specific we should omit this also by "-".
     // .populate('userId', 'name') // when we need extra information about user instead of looping through users and select the use by this userId we could use mongoose populate method due to collection relations and also select just name and also _id(because we dont omit that).
@@ -79,7 +82,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndDelete(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then(result => {
       res.redirect('/admin/products');
     })
