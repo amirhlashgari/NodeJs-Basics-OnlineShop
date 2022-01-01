@@ -41,6 +41,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage }).single('image'));
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('images', express.static(path.join(__dirname, 'images')));
 app.use(session({ secret: 'backendStoredSession', resave: false, saveUninitialized: false, store: store }));
 app.use(csrfProtection);
 app.use(flash());
